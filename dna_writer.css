@@ -1,0 +1,81 @@
+
+body { 
+	margin:0px; 
+	padding:0px;
+}
+
+
+#dna_writer_window {
+	background-color: #888;
+	top: 0px;
+	padding:0px;
+	margin: 0px;
+}
+
+.color_base {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 15px;
+	padding:0px;
+	margin: 0px;
+	width: 15px;
+	text-align:center;
+	border: 1px solid black;
+	border-width: 2px 1px 2px 1px;
+}
+/*
+.color_base {
+	height: 15px;
+	padding:0px;
+	margin: 0px;
+	width: 15px;
+	text-align:center;
+	border: 1px solid black;
+	border-width: 2px 1px 2px 1px;
+}
+*/
+.A {
+}
+.C {
+}
+.G {
+}
+.T {
+}
+
+/*
+.color_A_hi {
+	background-color: #903;	
+}		
+.color_T_hi {
+	background-color: #05a;	
+}		
+.color_G_hi {
+	background-color: #060;	
+}		
+.color_C_hi {
+	background-color: #880;	
+}
+*/
+
+.color_background {
+	background-color: #888;	
+}
+
+.indent{
+	position:relative;
+	left: 40px;
+	width:600px;
+}
+
+a {
+	color:black;
+}
+
+#header {
+	overflow: hidden;
+	width: 675px;
+	height: 40px;	
+}
+

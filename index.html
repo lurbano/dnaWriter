@@ -1,0 +1,627 @@
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+
+		<script type="text/javascript" src="jquery-1.7.2.js"></script>
+    	<script src="spectrum.js"></script>
+    	<link rel='stylesheet' href='spectrum.css' />
+    	<script src="kinetic-v4.0.2.js"></script>
+    	<script src="dna_writer.js"></script>
+
+		<title> Simple DNA Writer </title>
+
+		<style type="text/css">
+
+		  body {
+		  	background-color: #ffe;
+		  }
+
+	      input {
+	      	display:inline;
+	      	margin:5px;
+	      	background-color:#ddd;
+	      	padding:2px;
+	      	border-radius:5px;
+			box-shadow: 5px 5px 2px #888;
+	      }
+	      input:focus {
+	      	display:inline;
+	      	margin:5px;
+	      	background-color:#eee;
+	      	padding:2px;
+	      	border-radius:5px;
+	      	border:1px solid #555;
+			box-shadow: 5px 5px 2px #888;
+	      }
+
+	      .output {
+	      	background-color:#ccd;
+	      	padding:2px;
+	      	border:1px solid #555;
+	      	border-radius:0px;
+			box-shadow: none;
+	      }
+
+		.color_base {
+			position: absolute;
+			top: 0px;
+			height: 15px;
+			padding:0px;
+			margin: 0px;
+			width: 15px;
+			text-align:center;
+			margin-top:3px;
+			border: 1px solid black;
+			border-width: 2px 1px 2px 1px;
+		}
+		.A {
+		}
+		.C {
+		}
+		.G {
+		}
+		.T {
+		}
+
+
+		.color_A_hi {
+			background-color: #903;
+		}
+		.color_T_hi {
+			background-color: #05a;
+		}
+		.color_G_hi {
+			background-color: #060;
+		}
+		.color_C_hi {
+			background-color: #880;
+		}
+
+
+		.checkbox:hover {
+			background-color: #ccc;
+			border: 1px solid #555;
+		}
+
+	    .indent{
+			position:relative;
+			left: 40px;
+			width:90%;
+		}
+
+		#header {
+			height: 30px;
+			overflow: hidden;
+		}
+
+		.dnaCode {
+			height: 1.25em;
+			width: 600px;
+			overflow: hidden;
+		}
+      </style>
+
+	  <style id="color_css_A" type="text/css"></style>
+	  <style id="color_css_C" type="text/css"></style>
+	  <style id="color_css_T" type="text/css"></style>
+	  <style id="color_css_G" type="text/css"></style>
+
+
+    <script type="text/javascript">
+
+	  //set colors
+	  var color_A = '#ff2222';
+	  var color_C = '#ffff00';
+	  var color_G = '#00bb00';
+	  var color_T = '#00ccff';
+
+
+	  function getURLParameter(name) {
+    	return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+	  }
+
+	  //url parameters
+	  var in_text = getURLParameter("text") !== null ? decodeURI(getURLParameter("text")) : "DNA Writer";
+
+	  var in_seq = getURLParameter("seq") !== null ? decodeURI(getURLParameter("seq")) : "";
+
+	  var no_color = getURLParameter("no_color") !== null ? parseInt(getURLParameter("no_color")) : 0;
+
+	  var non_coding = getURLParameter("non_coding") !== null ? parseInt(getURLParameter("non_coding")) : 1;
+
+
+
+	  function update_toCode() {
+	  		if ($("#non_coding").is(":checked")){
+		  		code = translator.toCode_w_junk({
+		  			text: $("#text_in").val(),
+		  		});
+	  		} else {
+		  		code = translator.toCode({
+		  			text: $("#text_in").val(),
+		  		});
+	  		}
+
+	  		if ($("#color_code").is(":checked")){
+	  			translator.colorCode({
+		  			code: code,
+		  			div_id: "color_sequence",
+		  			height: "auto",
+		  		});
+	  		} else {
+	  			$("#color_sequence").html("");
+	  		}
+
+	  		//$("#sequence").html(code);
+	  		$("#sequence_out").val(code);
+	  }
+
+
+	  $(document).ready(function(){
+
+
+	  	$("#sequence_out").val("");
+	  	$("#message_out").val("");
+
+	  	translator = new dna_writer({});
+
+
+		translator.colorCode({
+			code: translator.toCode({text: "DNA Writer"}),
+			div_id: "head_line",
+		});
+
+
+	  	$("#text_in").change(update_toCode);
+	  	$("#to_code_but").click(update_toCode);
+
+	  	$("#color_code").click(function(){
+	  		code = typeof code !== 'undefined' ? code : "";
+
+	  		if ($("#color_code").is(":checked")){
+	  			translator.colorCode({
+		  			code: code,
+		  			div_id: "color_sequence",
+		  		});
+	  		} else {
+	  			$("#color_sequence").html("");
+	  		}
+
+	  		//$("#sequence").html(code);
+	  		$("#sequence_out").val(code);
+	  	});
+
+
+
+
+	  	$("#to_code_junk_print_but").click(function(){
+	  		code = translator.toCode_w_junk({
+	  			text: $("#text_in").val(),
+	  		});
+
+	  		var student = prompt("To (optional):");
+
+	  		print_window = window.open('','','width=800,height=800,scrollbars=yes,');
+
+	  		//txt = "To: "+student + "<p>";
+	  		//txt += code + "<p>";
+
+	  		txt = translator.writedb({
+	  			style:"print",
+	  			student: student,
+	  			code: code,
+	  		});
+
+			//alert(txt);
+	  		$(print_window.document.body).html(txt);
+
+	  		//$("#sequence").html(code);
+	  		$("#sequence_out").val(code);
+	  	});
+
+
+	  	$("#seq_in").change(function(){
+	  		$("#to_words_but").trigger('click');
+	  	});
+
+	  	$("#to_words_but").click(function(){
+	  		words = translator.toWords({
+	  			code: $("#seq_in").val(),
+	  		});
+	  		$("#message_out").val(words);
+	  		//$("#message").html(words);
+
+	  		if ($("#color_code_2").is(":checked")){
+	  			translator.colorCode({
+		  			code: $("#seq_in").val(),
+		  			div_id: "color_sequence_2",
+		  		});
+	  		} else {
+	  			$("#color_sequence_2").html("");
+	  		}
+
+	  	});
+
+		//output table
+		$("#translator").html(translator.writedb({style:"html",}));
+
+	  	$("#color_pick_A").spectrum("set", color_A);
+	  	$("#color_pick_C").spectrum("set", color_C);
+	  	$("#color_pick_G").spectrum("set", color_G);
+	  	$("#color_pick_T").spectrum("set", color_T);
+	  	$(".A").css("background-color", color_A);
+	  	$(".C").css("background-color", color_C);
+	  	$(".G").css("background-color", color_G);
+	  	$(".T").css("background-color", color_T);
+
+	  	$("#color_css_A").html(".A {background-color:"+color_A+";}");
+	  	$("#color_css_C").html(".C {background-color:"+color_C+";}");
+	  	$("#color_css_G").html(".G {background-color:"+color_G+";}");
+	  	$("#color_css_T").html(".T {background-color:"+color_T+";}");
+
+	  	$("#color_css_A").append(" .color_A_hi {background-color:#aaa;}");
+	  	$("#color_css_C").append(" .color_C_hi {background-color:#aaa;}");
+	  	$("#color_css_G").append(" .color_G_hi {background-color:#aaa;}");
+	  	$("#color_css_T").append(" .color_T_hi {background-color:#aaa;}");
+
+	  	$("#color_pick_A").spectrum({
+	  		change: function(color){
+	  			$(".A").css("background-color", color);
+	  			$("#color_css_A").html(".A {background-color:"+color+";} ");
+	  			$("#color_css_A").append(".color_A_hi {background-color:#aaa;}");
+	  		},
+	  	});
+	  	$("#color_pick_C").spectrum({
+	  		change: function(color){
+	  			$(".C").css("background-color", color);
+	  			$(".color_C_hi").css("background-color", "#aaa");
+	  			$("#color_css_C").html(".C {background-color:"+color+";} ");
+	  			$("#color_css_C").append(".color_C_hi {background-color:#aaa;}");
+	  		},
+	  	});
+	  	$("#color_pick_G").spectrum({
+	  		change: function(color){
+	  			$(".G").css("background-color", color);
+	  			$("#color_css_G").html(".G {background-color:"+color+";} ");
+	  			$("#color_css_G").append(".color_G_hi {background-color:#aaa;}");
+	  		},
+	  	});
+	  	$("#color_pick_T").spectrum({
+	  		change: function(color){
+	  			$(".T").css("background-color", color);
+	  			$("#color_css_T").html(".T {background-color:"+color+";} ");
+	  			$("#color_css_T").append(".color_T_hi {background-color:#aaa;}");
+	  		},
+	  	});
+
+
+
+
+	  	if (getURLParameter("text") !== null) {
+	  		$("#text_in").val(in_text);
+	  		if (no_color === 0) {
+	  			$("#color_code").prop('checked', true);
+	  		}
+	  		if (non_coding === 1) {
+	  			$("#non_coding").prop('checked', true);
+	  		}
+	  		$("#to_code_but").trigger('click');
+	  	}
+
+	  	if (getURLParameter("seq") !== null) {
+	  		location.href = "#base_to_text";
+	  		$("#seq_in").val(in_seq);
+	  		if (no_color === 0) {
+	  			$("#color_code_2").prop('checked', true);
+	  		}
+	  		$("#to_words_but").trigger('click');
+	  	}
+
+
+	  });
+
+
+    </script>
+
+
+
+
+	</head>
+
+	<body>
+
+		<iframe class="dnaCode" src="dna_writer.html?text=DNA_Writer&link=none" seamless></iframe>
+
+
+	<div id="main" style="width:80%; background-color:#ffd;border:2px solid black;padding:5px;">
+
+
+		<h1 style="align-text:center;">DNA Writer</h1>
+
+		Translate words into a sequence of DNA bases and convert them back again.
+
+		<div style="border:3px ridge black;background-color:#ffe;border-radius:5px;padding:4px;">
+		<h3>Translate text to base sequence</h3>
+		Enter text to translate: <input id="text_in" type="text"></input>
+		<input id="to_code_but" type="button" value="Create Code"></input> or
+
+		<input id="to_code_junk_print_but" type="button" value="Print Friendly Output" title="Use to create personalized handouts"></input>
+
+		<br>
+		<span class="checkbox">
+			Include non-coding DNA:
+			<input type="checkbox" id="non_coding" name="non_coding" value="non_coding" />
+		</span>
+		|| <br>
+		<span class="checkbox">
+			Show Color Sequence:
+			<input type="checkbox" id="color_code" name="color_code" value="color_code" />
+		</span>
+			<span id="color_selectors" style="position:relative;"> (
+				<span class="color_base A" id="color_select_A" style="position:relative;">A</span>
+				<input type='color' id='color_pick_A' />
+				<span class="color_base G" id="color_select_G" style="position:relative;">G</span>
+				<input type='color' id='color_pick_G' />
+				<span class="color_base C" id="color_select_C" style="position:relative;">C</span>
+				<input type='color' id='color_pick_C' />
+				<span class="color_base T" id="color_select_T" style="position:relative;">T</span>
+				<input type='color' id='color_pick_T' />
+				)
+			</span>
+
+		<p /><hr><b>Output:</b><br>
+		<div style="border-style:inset;background-color:white;">
+		<input id="sequence_out" class="output" type="text" style="width:95%;" value="" readonly />
+
+		<div id="color_sequence" style="position:relative;background-color:#fff;border-style:solid;border-width:1px;">
+		</div>
+
+		</div>
+
+		</div>
+		<p>
+
+
+
+
+
+
+		<div style="border:3px ridge black;background-color:#ffe;border-radius:5px;padding:4px;">
+		<a name="base_to_text" ></a>
+		<h3>Translate base sequence to text</h3>
+		Enter Sequence: <input id="seq_in" type="text" size="80"></input><br>
+		<input id="to_words_but" type="button" value="Translate Code"></input>
+
+		<span class="checkbox">
+			Show Color Sequence:
+			<input type="checkbox" id="color_code_2" name="color_code_2" value="color_code_2" />
+		</span>
+
+
+		<p /><hr><b>Output:</b><br>
+		<div style="border-style:inset;background-color:white;">
+
+		<input id="message_out" class="output" type="text" style="width:95%;" value="" readonly />
+
+		<div id="color_sequence_2" style="position:relative;height:1em;background-color:#fff;border-style:solid;border-width:1px;">
+		</div>
+
+		</div>
+
+		</div>
+
+
+
+		<p><hr>
+		<h3 id="how">How it works</h3>
+		The code uses a simple look-up table (see below) where each letter in the English alphabet is assigned a unique three letter code. The three letters are chosen from the letters of the DNA bases: AGCT. Any unknown characters or punctuation are ignored.
+		<p>
+		More details: <a href="https://montessorimuddle.org/2013/02/02/dna-writer/">DNA Writer on MontessoriMuddle.org</a>
+
+		<p>
+		<h4 id="translation_table">Translation Table:</h4>
+		<div id="translator" style="background-color:#cac;">
+		</div>
+
+<p style="clear:both;">----</p><hr>
+		<h3 id="usage">URL Parameters</h3>
+
+		To automatically load text or a sequence you can use the following url parameters.
+			<p></p>
+
+		<b>text</b> -- input text to convert to a nucleobase sequence.
+			<p class="indent">
+				For example, the url to input the text "Hello":
+			</p>
+			<code class="indent">
+				<a href="https://earthsciweb.org/js/bio/dna-writer/index.html?text=Hello">https://earthsciweb.org/js/bio/dna-writer/index.html?text=Hello</a>
+			</code>
+			<p></p>
+
+		<b>seq</b> -- to convert from a nucleobase sequence into text.
+			<p class="indent">
+				For example, the url to input the sequence "CGTCTAATCATCTGT" (which translates to "HELLO"):
+			</p>
+			<code class="indent">
+				<a href="https://earthsciweb.org/js/bio/dna-writer/index.html?seq=CGTCTAATCATCTGT">https://earthsciweb.org/js/bio/dna-writer/index.html?seq=CGTCTAATCATCTGT</a>
+			</code>
+			<p></p>
+
+		<b>no_color</b> -- to stop the showing of the translated color bars. Set to "1" for no show. Defaults to show the color bar (no_show=0):
+			<p class="indent">
+				For example, no color bar with the url to input the sequence "CGTCTAATCATCTGT" (which translates to "HELLO"):
+			</p>
+			<code class="indent">
+				<a href="https://earthsciweb.org/js/bio/dna-writer/index.html?seq=CGTCTAATCATCTGT&no_color=1">https://earthsciweb.org/js/bio/dna-writer/index.html?seq=CGTCTAATCATCTGT&no_color=1</a>
+			</code>
+			<p></p>
+
+		<b>non_coding</b> -- set to "0" (non_coding=0) to prevent the page from adding a small segment of non-coding nucleobased to the front and back end of the sequence when converting from text:
+			<p class="indent">
+				For example, to convert the text "hello" without the non-coding bases:
+			</p>
+			<code class="indent">
+				<a href="https://earthsciweb.org/js/bio/dna-writer/index.html?text=hello&non_coding=0">https://earthsciweb.org/js/bio/dna-writer/index.html?text=hello&non_coding=0</a>
+			</code>
+			<p></p>
+
+
+
+
+		<p><hr>
+		<h3 id="embedding">Embedding the Color Sequences</h3>
+
+
+			Since they are so pretty to look at, I've created a method of embedding only the colored nucleobase sequences into other webpages by including the page <em>dna_embed.html</em> into iframes. The bars at the top and bottom of this page are examples. The bar at the top of the page uses:
+			<p />
+			<textarea style="width:90%;border:1px solid black;" rows="3" readonly="readonly" class="indent">&lt;iframe style="overflow:hidden;" src="https://earthsciweb.org/js/bio/dna-writer/dna_writer.html?text=DNA_Writer&link=none" width="480"  height="19" seamless &gt; &lt;/iframe&gt;</textarea>
+
+
+			<p></p>
+
+			The options are:<p></p>
+
+		<b>text</b> -- the text you want coded. For ease of use, underscores ("_") are used to delimit words by default:
+			<p class="indent">
+				For example, to convert the text "Hello Guys" use:
+			</p>
+			<code class="indent">
+				<a href="https://earthsciweb.org/js/bio/dna-writer/dna_writer.html?text=Hello_Guys">https://earthsciweb.org/js/bio/dna-writer/index.html?text=Hello_Guys</a>
+			</code>
+
+			<p class="indent">
+				With the iframe it looks like this:
+			</p>
+			<textarea style="width:90%;border:1px solid black;" rows="3" readonly="readonly" class="indent">&lt;iframe style="overflow:hidden;" src="https://earthsciweb.org/js/bio/dna-writer/dna_writer.html?text=Hello_Guys" width="480"  height="19" seamless &gt; &lt;/iframe&gt;</textarea>
+
+			<p class="indent">
+				Embedded, it looks like this:
+			</p>
+
+			<p class="indent">
+				<iframe class="dnaCode" src="https://earthsciweb.org/js/bio/dna-writer/dna_writer.html?text=Hello_Guys" seamless ></iframe>
+			</p>
+
+
+		<b>link</b> -- by default the sequence is created as a link that comes back to this page. To turn off this behavior set link to "none". It's set up so that if you click on any of the letters they switch to grey:
+			<p class="indent">
+				For example, using with the "Hello Guys" text:
+			</p>
+			<code class="indent">
+				<a href="https://earthsciweb.org/js/bio/dna-writer/dna_writer.html?text=Hello_Guys&link=none">https://earthsciweb.org/js/bio/dna-writer/index.html?text=Hello_Guys&link=none</a>
+			</code>
+
+			<p class="indent">
+				With the iframe it looks like this:
+			</p>
+			<textarea style="width:90%;border:1px solid black;" rows="3" readonly="readonly" class="indent">&lt;iframe style="overflow:hidden;" src="https://earthsciweb.org/js/bio/dna-writer/dna_writer.html?text=Hello_Guys&link=none" width="480"  height="19" seamless &gt; &lt;/iframe&gt;</textarea>
+
+			<p class="indent">
+				Embedded, it looks like this (try clicking on the letters):
+			</p>
+
+			<p class="indent">
+				<iframe class="dnaCode" src="https://earthsciweb.org/js/bio/dna-writer/dna_writer.html?text=Hello_Guys&link=none" seamless ></iframe>
+			</p>
+
+
+
+
+
+		<b>title</b> -- when the mouse hovers over the color sequence it shows the text that was converted into the sequence. However, you can have this show up as the letter sequence itself (title_txt=seq) or as any text you'd like (title=Example_1). Options:
+			<p />
+
+			<div class="indent">
+				<em>seq</em> - show the sequence:
+
+			<p class="indent">
+				<a href="https://earthsciweb.org/js/bio/dna-writer/dna_writer.html?text=Hello_Guys&title=seq">https://earthsciweb.org/js/bio/dna-writer/index.html?text=Hello_Guys&title=seq</a>
+			</p>
+
+			<p class="indent">
+				<iframe class="dnaCode" src="dna_writer.html?text=Hello_Guys&title=Example_1"  seamless ></iframe>
+			</p>
+
+			</div>
+
+
+			<div class="indent">
+				<em>[text]</em> - use this as the title text. For example, using "Example 1" as the title (use underscores for spaces):
+
+			<p class="indent">
+				<a href="https://earthsciweb.org/js/bio/dna-writer/dna_writer.html?text=Hello_Guys&title=Example_1">https://earthsciweb.org/js/bio/dna-writer/index.html?text=Hello_Guys&title=Example_1</a>
+			</p>
+
+			<p class="indent">
+				<iframe  class="dnaCode" src="dna_writer.html?text=Hello_Guys&title=Example_1"  seamless ></iframe>
+			</p>
+
+			</div>
+
+
+			<p></p>
+
+
+
+
+		<b>ncols</b> -- Set the number of columns for the sequence tiles. The tiles will automatically wrap to the width of the window by default, but this gives a different type of control, and you're going to have to adjust the dimensions of your iframe.
+			<p />
+			<p class="indent">
+				For example, using 5 columns:
+			</p>
+			<code class="indent">
+				<a href="https://earthsciweb.org/js/bio/dna-writer/dna_writer.html?text=Hello_Guys&ncols=5">https://earthsciweb.org/js/bio/dna-writer/index.html?text=Hello_Guys&ncols=5</a>
+			</code>
+
+			<p class="indent">
+				With the iframe it looks like this:
+			</p>
+			<textarea style="width:90%;border:1px solid black;" rows="3" readonly="readonly" class="indent">&lt;iframe style="overflow:hidden;" src="https://earthsciweb.org/js/bio/dna-writer/dna_writer.html?text=Hello_Guys&ncols=5" width=80 height=108 seamless &gt; &lt;/iframe&gt;</textarea>
+
+			<p class="indent">
+				Embedded, it looks like this (try clicking on the letters):
+			</p>
+
+			<p class="indent">
+				<iframe  style="width:90px;height:120px;" src="dna_writer.html?text=Hello_Guys&ncols=5" seamless ></iframe>
+			</p>
+
+
+			<p></p>
+
+
+
+
+<p style="clear:both;">----</p><hr>
+<div id="copyright" style="float:none; margin:10px;width:420px; ><a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/3.0/deed.en_US"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png" /></a><br /><span xmlns:dct="https://purl.org/dc/terms/" href="https://purl.org/dc/dcmitype/InteractiveResource" property="dct:title" rel="dct:type">Simple DNA Writer (2013)</span> by <span xmlns:cc="https://creativecommons.org/ns#" property="cc:attributionName"><a href="https://montessorimuddle.org/contact-me/">Lensyl Urbano<a></span> is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-nc-sa/3.0/deed.en_US">Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported License</a>.
+
+	</div>
+	</div>
+
+<div style="position:absolute;left:82%;top:110px;background-color:#ccc;border:1px solid black;width:130px;z-index:-1;">
+Advertisement
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<!-- Soriki Embeds Vertical -->
+<ins class="adsbygoogle"
+     style="display:block"
+     data-ad-client="ca-pub-4882194254651107"
+     data-ad-slot="6676259843"
+     data-ad-format="auto"
+     data-full-width-responsive="true"></ins>
+<script>
+     (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+</div>
+
+	<div id="head_line" style="position:absolute; top:-20px; left:5px;width:98%;height:20px;"></div>
+
+	<iframe src="dna_writer.html?text=by_Lensyl_Urbano&link=none" width="593" height="19" style="overflow:hidden;" seamless></iframe>
+
+	</body>
+
+</html>

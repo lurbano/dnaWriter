@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
+		<base target="_blank" />
+		<script type="text/javascript" src="jquery-1.7.2.js"></script>
+    	<script src="dna_writer.js"></script>
+    	<link rel="stylesheet" type="text/css" href="dna_writer.css">
+ 	
+		<title> DNA Writer Embed </title>
+		
+		<style type="text/css">
+		</style>
+
+	  <style id="color_css_A" type="text/css"></style>
+	  <style id="color_css_C" type="text/css"></style>
+	  <style id="color_css_T" type="text/css"></style>
+	  <style id="color_css_G" type="text/css"></style>
+			
+		<script type="text/javascript">
+			var color_A = '#ff2222';
+			var color_C = '#ffff00';
+			var color_G = '#00bb00';
+			var color_T = '#00ccff';
+
+	  	$("#color_css_A").html(".A {background-color:"+color_A+";}");
+	  	$("#color_css_C").html(".C {background-color:"+color_C+";}");
+	  	$("#color_css_G").html(".G {background-color:"+color_G+";}");
+	  	$("#color_css_T").html(".T {background-color:"+color_T+";}");
+			
+			
+			function getURLParameter(name) {
+    			return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.search)||[,""])[1].replace(/\+/g, '%20'))||null;
+			}
+			
+			//url parameters
+			var in_text = getURLParameter("text") !== null ? getURLParameter("text") : "DNA Writer"; 
+			
+			var sep = getURLParameter("sep") !== null ? getURLParameter("sep") : '_';
+
+			var link = getURLParameter("link") !== null ? getURLParameter("link") : "home"; 
+			
+			var title_txt = getURLParameter("title") !== null ? getURLParameter("title") : 'text'; 
+
+			var ncols = getURLParameter("ncols") !== null ? getURLParameter("ncols") : 0; 
+			
+			//alert(title_txt);
+						
+			$(document).ready(function(){
+				var width = $(window).width();
+				var height = $(window).height();
+				
+				
+				translator = new dna_writer({});
+				
+				var code = translator.toCode({
+					text: in_text,
+					separator: sep,
+				})
+				
+				translator.colorCode({
+					code: code,
+					div_id: "dna_writer_window",
+					link: link,
+					title: title_txt,
+					//dimensions: "fit",
+					ncols: ncols,
+				});
+				
+
+			});
+		</script>
+
+	</head>
+
+	<body>
+		<div id="dna_writer_window"></div>
+	</body>
+
+</html>
